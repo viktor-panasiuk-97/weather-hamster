@@ -1,14 +1,22 @@
 import { geoCordinatesByCityName } from "@/api/weather-api";
-import { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { SearchInput } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function Index() {
+  const [searchValue, setSearchValue] = useState("");
+
   useEffect(() => {
     geoCordinatesByCityName('Lutsk').then(console.log)
   }, [])
+
   return (
     <View style={styles.container}>
-      <Text>Edit src/app/index.tsx to edit this screen.</Text>
+      <SearchInput
+        value={searchValue}
+        onChangeText={setSearchValue}
+        placeholder="Search for a city"
+      />
     </View>
   );
 }
@@ -16,7 +24,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 16,
   },
 });
