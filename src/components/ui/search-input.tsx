@@ -5,8 +5,8 @@ import { StyleSheet, Text, TextInput, View, type TextInputProps } from "react-na
 export function SearchInput({ style, ...props }: TextInputProps) {
   return (
     <View style={styles.container}>
-      <TextInput style={[styles.input, style]} {...props} />
-      <Text style={styles.icon}>🔍</Text>
+      <TextInput accessibilityLabel={props.placeholder ?? "Search"} style={[styles.input, style]} {...props} />
+      <Text style={styles.icon} accessibilityElementsHidden={true} importantForAccessibility="no-hide-descendants">🔍</Text>
     </View>
   );
 }

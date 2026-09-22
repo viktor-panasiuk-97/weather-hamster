@@ -25,5 +25,5 @@ There is no test suite configured in this repo.
 # Important
 - For requests explicitly described as generic or standalone, do not scan the project for conventions unless asked.
 
-- After each task show total cost of tokens!
+- After each task show total spend of tokens!
 - You should not implement or update tests.
