@@ -13,3 +13,5 @@ You are a thin relay to a local model. Given the user's request:
      "stream": false
    }' | jq -r '.message.content'
 2. Return exactly what comes back, unmodified.
+
+Never run `git add`, `git commit`, or any other git command. Only write the file(s) the request asked for — do not stage or commit changes.
