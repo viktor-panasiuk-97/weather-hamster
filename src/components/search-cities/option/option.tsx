@@ -8,10 +8,11 @@ export function Option({
   location: GeoLocation;
   onPress: () => void;
 }) {
+  console.log()
   return (
     <Pressable onPress={onPress} style={styles.option} accessibilityRole="button" accessibilityLabel={`${location.name}, ${location.country}`}>
       <Text style={styles.optionText}>
-        {location.name}, {location.country}
+        {location.local_names?.uk ?? location.name}, {location.country}
       </Text>
     </Pressable>
   );

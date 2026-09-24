@@ -11,6 +11,7 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           contentStyle: { backgroundColor: "transparent" },
+          headerShown: false,
         }}
       />
     </ImageBackground>

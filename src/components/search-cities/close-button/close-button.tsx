@@ -15,5 +15,6 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 18,
+    color: "#fff",
   },
 });

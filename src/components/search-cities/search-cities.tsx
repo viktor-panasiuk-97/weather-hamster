@@ -4,12 +4,12 @@ import { geoCordinatesByCityName, type GeoLocation } from "@/api/weather-api";
 import { CloseButton } from "@/components/search-cities/close-button";
 import { NotFound } from "@/components/search-cities/not-found";
 import { Option } from "@/components/search-cities/option";
-import { Overlay } from "@/components/search-cities/overlay";
 import { SearchInput } from "@/components/ui/search-input";
 import { addCities } from "@/store/cities";
 import { debounce } from "@/utils/debounce";
 import { useEffect, useRef, useState } from "react";
 import {
+  Modal,
   ScrollView,
   StyleProp,
   StyleSheet,
@@ -72,52 +72,66 @@ export function SearchCities({ style }: SearchCitiesProps) {
 
   return (
     <View style={style}>
-      {isOpen && <Overlay />}
-      <View style={isOpen ? styles.fixedInputWrapper : styles.inputWrapper}>
-        <View style={styles.searchInputFlex}>
-          <SearchInput
-            value={query}
-            onChangeText={handleChangeText}
-            onFocus={handleFocus}
-            placeholder="Search for a city"
-          />
-        </View>
-        {isOpen && <CloseButton onPress={handleClose} />}
-      </View>
-      {isOpen && query.trim().length > 0 && (
-        <View style={styles.resultsContainer}>
-          {results.length === 0 ? (
-            <NotFound />
-          ) : (
-            <ScrollView style={styles.resultsList} keyboardShouldPersistTaps="handled">
-              {results.map((location, index) => (
-                <Option
-                  key={`${location.name}-${location.country}-${index}`}
-                  location={location}
-                  onPress={() => handleSelect(location)}
+      {!isOpen && (
+        <SearchInput
+          value={query}
+          onChangeText={handleChangeText}
+          onFocus={handleFocus}
+          placeholder="Search for a city"
+        />
+      )}
+      {isOpen && (
+        <Modal
+          visible
+          animationType="fade"
+          onRequestClose={handleClose}
+          backdropColor="#121212"
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalInputWrapper}>
+              <View style={styles.searchInputFlex}>
+                <SearchInput
+                  value={query}
+                  onChangeText={handleChangeText}
+                  onFocus={handleFocus}
+                  placeholder="Search for a city"
+                  autoFocus
                 />
-              ))}
-            </ScrollView>
-          )}
-        </View>
+              </View>
+              <CloseButton onPress={handleClose} />
+            </View>
+            {query.trim().length > 0 && (
+              <View style={styles.resultsContainer}>
+                {results.length === 0 ? (
+                  <NotFound />
+                ) : (
+                  <ScrollView style={styles.resultsList} keyboardShouldPersistTaps="handled">
+                    {results.map((location, index) => (
+                      <Option
+                        key={`${location.name}-${location.country}-${index}`}
+                        location={location}
+                        onPress={() => handleSelect(location)}
+                      />
+                    ))}
+                  </ScrollView>
+                )}
+              </View>
+            )}
+          </View>
+        </Modal>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  fixedInputWrapper: {
-    position: "fixed" as ViewStyle["position"],
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 20,
+  modalContent: {
+    flex: 1,
+    backgroundColor: "#121212",
     paddingHorizontal: 16,
     paddingTop: 16,
+  },
+  modalInputWrapper: {
     flexDirection: "row",
     alignItems: "center",
   },
@@ -125,14 +139,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   resultsContainer: {
-    position: "fixed" as ViewStyle["position"],
-    top: 64,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 20,
-    paddingHorizontal: 16,
-    paddingTop: 8,
+    flex: 1,
+    marginTop: 8,
   },
   resultsList: {
     backgroundColor: "#fff",
