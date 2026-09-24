@@ -48,12 +48,14 @@ export async function getCitiesWeather(
   );
 
   const result: Record<string, { latestUpdateTimeStamp: number; data: CurrentWeatherData }> = {};
+
   for (const row of rows) {
     result[row.city_name] = {
       latestUpdateTimeStamp: row.latest_update_timestamp,
       data: JSON.parse(row.data) as CurrentWeatherData,
     };
   }
+
 
   return result;
 }

@@ -79,7 +79,6 @@ export async function geoCordinatesByCityName(
     limit: String(limit),
     appid: APP_ID,
   });
-  console.log(`${GEO_BASE_URL}?${params.toString()}`)
 
   const response = await fetch(`${GEO_BASE_URL}?${params.toString()}`);
 

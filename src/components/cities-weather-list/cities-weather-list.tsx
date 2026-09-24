@@ -1,13 +1,14 @@
 import { getCurrentWeatherData, type CurrentWeatherData, type GeoLocation } from "@/api/weather-api";
 import { getCities } from "@/store/cities";
 import { getCitiesWeather, setCityWeather } from "@/store/current-weather-in-cities";
+import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { ScrollView, StyleProp, StyleSheet, Text, ViewStyle } from "react-native";
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
 function cityKey(city: GeoLocation) {
-  return `${city.name}_${city.state}`;
+  return `${city.name}_${city.state}_${city.country}`;
 }
 
 type CitiesWeatherListProps = {
@@ -16,12 +17,18 @@ type CitiesWeatherListProps = {
 
 function CityRow({ city, data }: { city: GeoLocation; data: CurrentWeatherData }) {
   return (
-    <View style={styles.row}>
+    <Link
+      href={{
+        pathname: "/city-weather",
+        params: { locationKey: cityKey(city) },
+      }}
+      style={styles.row}
+    >
       <Text style={styles.cityName}>
         {city.name}, {city.country}
       </Text>
       <Text style={styles.temperature}>{Math.round(data.main.temp)}°</Text>
-    </View>
+    </Link>
   );
 }
 

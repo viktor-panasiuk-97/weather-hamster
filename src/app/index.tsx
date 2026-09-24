@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     paddingHorizontal: 16,
+    backgroundColor: "transparent",
   },
   list: {
     marginTop: 16,
