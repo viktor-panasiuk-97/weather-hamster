@@ -1,10 +1,12 @@
+import { CitiesWeatherList } from "@/components/cities-weather-list";
 import { SearchCities } from "@/components/search-cities";
 import { StyleSheet, View } from "react-native";
 
 export default function Index() {
   return (
     <View style={styles.container}>
-      <SearchCities />
+      <SearchCities style={{ paddingTop: 16 }} />
+      <CitiesWeatherList style={styles.list} />
     </View>
   );
 }
@@ -12,7 +14,10 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     paddingHorizontal: 16,
+  },
+  list: {
+    marginTop: 16,
   },
 });

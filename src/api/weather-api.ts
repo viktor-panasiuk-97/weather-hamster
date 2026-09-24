@@ -1,6 +1,7 @@
 import { APP_ID } from "@/constants/env";
 
 const GEO_BASE_URL = "https://api.openweathermap.org/geo/1.0/direct";
+const CURRENT_WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 export type GeoLocation = {
   name: string;
@@ -9,6 +10,44 @@ export type GeoLocation = {
   lon: number;
   country: string;
   state?: string;
+};
+
+export type CurrentWeatherData = {
+  coord: { lon: number; lat: number };
+  weather: {
+    id: number;
+    main: string;
+    description: string;
+    icon: string;
+  }[];
+  base: string;
+  main: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    pressure: number;
+    humidity: number;
+    sea_level?: number;
+    grnd_level?: number;
+  };
+  visibility: number;
+  wind: { speed: number; deg: number; gust?: number };
+  clouds: { all: number };
+  rain?: { "1h"?: number; "3h"?: number };
+  snow?: { "1h"?: number; "3h"?: number };
+  dt: number;
+  sys: {
+    type?: number;
+    id?: number;
+    country: string;
+    sunrise: number;
+    sunset: number;
+  };
+  timezone: number;
+  id: number;
+  name: string;
+  cod: number;
 };
 
 export class WeatherApiError extends Error {
@@ -50,4 +89,32 @@ export async function geoCordinatesByCityName(
   }
 
   return response.json() as Promise<GeoLocation[]>;
+}
+
+export async function getCurrentWeatherData(
+  lat: number,
+  lon: number,
+  units: "standard" | "metric" | "imperial" = "metric",
+): Promise<CurrentWeatherData> {
+  if (!APP_ID) {
+    throw new Error(
+      "EXPO_PUBLIC_OPENWEATHERMAP_APP_ID is not set — copy .env.example to .env",
+    );
+  }
+
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lon: String(lon),
+    units,
+    appid: APP_ID,
+  });
+
+  const response = await fetch(`${CURRENT_WEATHER_BASE_URL}?${params.toString()}`);
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new WeatherApiError(response.status, response.statusText, body);
+  }
+
+  return response.json() as Promise<CurrentWeatherData>;
 }
