@@ -1,9 +1,12 @@
 import { getCurrentWeatherData, type CurrentWeatherData, type GeoLocation } from "@/api/weather-api";
+import { WeatherHamsterIcon } from "@/components/weather-hamster-icon";
 import { getCities } from "@/store/cities";
 import { getCitiesWeather, setCityWeather } from "@/store/current-weather-in-cities";
+import { getHamsterVariant } from "@/utils";
+import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, StyleProp, StyleSheet, Text, ViewStyle } from "react-native";
+import { Pressable, ScrollView, StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
@@ -15,19 +18,41 @@ type CitiesWeatherListProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-function CityRow({ city, data }: { city: GeoLocation; data: CurrentWeatherData }) {
+function CityCard({ city, data }: { city: GeoLocation; data: CurrentWeatherData }) {
   return (
     <Link
       href={{
         pathname: "/city-weather",
         params: { locationKey: cityKey(city) },
       }}
-      style={styles.row}
+      asChild
     >
-      <Text style={styles.cityName}>
-        {city.name}, {city.country}
-      </Text>
-      <Text style={styles.temperature}>{Math.round(data.main.temp)}°</Text>
+      <Pressable style={styles.cardWrapper}>
+        <LinearGradient
+          colors={["#ffc285", "#f07b1f"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.card}
+        >
+          <View style={styles.leftColumn}>
+            <Text style={styles.cityName}>
+              {city.name}, {city.country}
+            </Text>
+            <Text style={styles.description} numberOfLines={1}>
+              {data.weather[0]?.description}
+            </Text>
+          </View>
+          <View style={styles.icon}>
+            <WeatherHamsterIcon variant={getHamsterVariant(data.weather[0]?.icon)} size={72} />
+          </View>
+          <View style={styles.rightColumn}>
+            <Text style={styles.currentTemp}>{Math.round(data.main.temp)}°</Text>
+            <Text style={styles.minMax}>
+              H: {Math.round(data.main.temp_max)}°  L: {Math.round(data.main.temp_min)}°
+            </Text>
+          </View>
+        </LinearGradient>
+      </Pressable>
     </Link>
   );
 }
@@ -70,7 +95,7 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
       {cities.map((city) => {
         const data = weatherByCity[cityKey(city)];
 
-        return data ? <CityRow key={cityKey(city)} city={city} data={data} /> : null;
+        return data ? <CityCard key={cityKey(city)} city={city} data={data} /> : null;
       })}
     </ScrollView>
   );
@@ -79,25 +104,48 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
 const styles = StyleSheet.create({
   content: {
     paddingVertical: 8,
-    backgroundColor: "#121212",
   },
-  row: {
+  cardWrapper: {
+    marginHorizontal: 16,
+    marginVertical: 5,
+  },
+  card: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    backgroundColor: "#1c1c1e",
-    borderBottomWidth: 1,
-    borderBottomColor: "#2a2a2c",
+    borderRadius: 14,
+    padding: 12,
+    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+  },
+  leftColumn: {
+    flex: 1,
+    justifyContent: "space-between",
   },
   cityName: {
-    fontSize: 16,
+    fontSize: 20,
+    fontWeight: "600",
     color: "#e5e5e7",
   },
-  temperature: {
-    fontSize: 16,
-    color: "#8e8e93",
-    fontWeight: "600",
+  description: {
+    fontSize: 13,
+    color: "#d1d1d6",
+    textTransform: "capitalize",
+  },
+  icon: {
+    alignSelf: "center",
+    marginHorizontal: 12,
+  },
+  rightColumn: {
+    flex: 1,
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+  currentTemp: {
+    fontSize: 40,
+    fontWeight: "300",
+    color: "#e5e5e7",
+  },
+  minMax: {
+    fontSize: 13,
+    color: "#d1d1d6",
   },
 });

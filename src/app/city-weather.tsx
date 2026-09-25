@@ -1,6 +1,7 @@
 import type { CurrentWeatherData } from "@/api/weather-api";
-import { WeatherHamster, type WeatherHamsterVariant } from "@/components/weather-hamster";
+import { WeatherHamster } from "@/components/weather-hamster";
 import { getCitiesWeather } from "@/store/current-weather-in-cities";
+import { getHamsterVariant } from "@/utils";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -10,22 +11,6 @@ function formatTime(unixSeconds: number) {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-const ICONS_MAP: Record<string, WeatherHamsterVariant> = {
-  "01d": "clear sky",
-   "02d":"few clouds", 
-   "03d":"scattered clouds",
-   "04d": "broken clouds",
-   "09d": "shower rain",
-   "10d": "rain",
-   "11d": "thunderstorm",
-   "13d": "snow",
-   "50d": "mist"
-}
-
-function getHamsterVariant(icon: string | undefined): WeatherHamsterVariant {
-  return (typeof icon !== 'undefined' ? ICONS_MAP[icon] : undefined) ?? "sleep";
 }
 
 function TableRow({ label, value }: { label: string; value: string }) {
