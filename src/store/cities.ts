@@ -29,6 +29,16 @@ export async function addCities(cities: GeoLocation[]) {
   }
 }
 
+export async function removeCities(cities: GeoLocation[]) {
+  for (const city of cities) {
+    await db.runAsync(
+      "DELETE FROM cities WHERE lat = ? AND lon = ?",
+      city.lat,
+      city.lon,
+    );
+  }
+}
+
 export async function getCities(): Promise<GeoLocation[]> {
   const rows = await db.getAllAsync<{
     name: string;
