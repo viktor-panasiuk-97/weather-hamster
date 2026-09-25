@@ -1,5 +1,6 @@
 import { getCurrentWeatherData, type CurrentWeatherData, type GeoLocation } from "@/api/weather-api";
 import { CityCard } from "@/components/cities-weather-list/city-card";
+import { useCities } from "@/context/cities";
 import { getCities, removeCities } from "@/store/cities";
 import { getCitiesWeather, setCityWeather } from "@/store/current-weather-in-cities";
 import { useEffect, useState } from "react";
@@ -16,12 +17,13 @@ type CitiesWeatherListProps = {
 };
 
 export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
-  const [cities, setCities] = useState<GeoLocation[]>([]);
+  const { cities, setCities, setIsLoading } = useCities();
   const [weatherByCity, setWeatherByCity] = useState<Record<string, CurrentWeatherData>>({});
 
   useEffect(() => {
     getCities().then(async (cities) => {
       setCities(cities);
+      setIsLoading(false);
 
       const cityNames = cities.map(cityKey);
       const citiesWeather = await getCitiesWeather(cityNames);
@@ -46,11 +48,11 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
         });
       });
     });
-  }, []);
+  }, [cities.length, setCities, setIsLoading]);
 
   async function handleDelete(city: GeoLocation) {
     await removeCities([city]);
-    setCities((prev) => prev.filter((c) => c.lat !== city.lat || c.lon !== city.lon));
+    setCities(cities.filter((c) => c.lat !== city.lat || c.lon !== city.lon));
   }
 
   return (
