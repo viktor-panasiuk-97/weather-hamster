@@ -10,6 +10,15 @@ const ICONS_MAP: Record<string, WeatherHamsterVariant> = {
   "11d": "thunderstorm",
   "13d": "snow",
   "50d": "mist",
+  "01n": "clear sky",
+  "02n": "few clouds",
+  "03n": "scattered clouds",
+  "04n": "broken clouds",
+  "09n": "shower rain",
+  "10n": "rain",
+  "11n": "thunderstorm",
+  "13n": "snow",
+  "50n": "mist",
 };
 
 export function getHamsterVariant(icon: string | undefined): WeatherHamsterVariant {

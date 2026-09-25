@@ -65,12 +65,13 @@ export default function CityWeather() {
       setWeather(weather[locationKey] ?? null);
     });
   }, [locationKey]);
-
+  
   return (
     <View style={styles.container}>
       {weather ? (
         <>
           <Text style={styles.cityName}>{weather.data.name}</Text>
+
           <View style={styles.hamster}>
             <WeatherHamster variant={getHamsterVariant(weather.data.weather[0]?.icon)} size={150} />
           </View>
