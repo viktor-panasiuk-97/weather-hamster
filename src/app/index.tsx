@@ -1,13 +1,17 @@
 import { CitiesWeatherList } from "@/components/cities-weather-list";
 import { SearchCities } from "@/components/search-cities";
-import { StyleSheet, View } from "react-native";
+import { ImageBackground, StyleSheet } from "react-native";
 
 export default function Index() {
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={require("@/assets/images/bg.jpg")}
+      style={styles.container}
+      resizeMode="repeat"
+    >
       <SearchCities style={{ paddingTop: 16 }} />
       <CitiesWeatherList style={styles.list} />
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -16,7 +20,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     paddingHorizontal: 16,
-    backgroundColor: "transparent",
   },
   list: {
     marginTop: 16,

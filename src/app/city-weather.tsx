@@ -2,9 +2,24 @@ import type { CurrentWeatherData } from "@/api/weather-api";
 import { WeatherHamster } from "@/components/weather-hamster";
 import { getCitiesWeather } from "@/store/current-weather-in-cities";
 import { getHamsterVariant } from "@/utils";
-import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState, } from "react";
+import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
+
+function goHome() {
+  if (router.canGoBack()) {
+    router.back();
+  } else {
+    router.replace("/");
+  }
+}
 
 function formatTime(unixSeconds: number) {
   return new Date(unixSeconds * 1000).toLocaleTimeString([], {
@@ -65,9 +80,36 @@ export default function CityWeather() {
       setWeather(weather[locationKey] ?? null);
     });
   }, [locationKey]);
-  
+
+  const { height } = useWindowDimensions();
+  const translateY = useSharedValue(0);
+
+  const pan = Gesture.Pan()
+    .activeOffsetY(10)
+    .failOffsetX([-10, 10])
+    .onUpdate((e) => {
+      translateY.value = Math.max(0, e.translationY);
+    })
+    .onEnd((e) => {
+      if (translateY.value > height * 0.25 || e.velocityY > 800) {
+        scheduleOnRN(goHome);
+      } else {
+        translateY.value = withSpring(0);
+      }
+    });
+
+  const containerStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
   return (
-    <View style={styles.container}>
+    <GestureDetector gesture={pan}>
+    <Animated.View style={[styles.container, containerStyle]}>
+      <ImageBackground
+        source={require("@/assets/images/bg.jpg")}
+        style={styles.background}
+        resizeMode="repeat"
+      >
       {weather ? (
         <>
           <Text style={styles.cityName}>{weather.data.name}</Text>
@@ -87,12 +129,17 @@ export default function CityWeather() {
       ) : (
         <Text style={styles.loading}>Loading…</Text>
       )}
-    </View>
+      </ImageBackground>
+    </Animated.View>
+    </GestureDetector>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  background: {
     flex: 1,
     padding: 16,
   },
