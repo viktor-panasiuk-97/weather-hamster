@@ -1,4 +1,4 @@
-import { APP_ID } from "@/constants/env";
+import { requireAppId } from "@/constants/env";
 
 const GEO_BASE_URL = "https://api.openweathermap.org/geo/1.0/direct";
 const CURRENT_WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
@@ -111,20 +111,21 @@ export class WeatherApiError extends Error {
   }
 }
 
+/**
+ * Looks up locations matching a city name via the OpenWeatherMap Geocoding API.
+ *
+ * @param cityName City name, optionally with state/country code (e.g. "London,GB").
+ * @param limit Maximum number of matches to return.
+ * @throws {WeatherApiError} If the API responds with a non-2xx status.
+ */
 export async function geoCordinatesByCityName(
   cityName: string,
   limit: number = 10,
 ): Promise<GeoLocation[]> {
-  if (!APP_ID) {
-    throw new Error(
-      "EXPO_PUBLIC_OPENWEATHERMAP_APP_ID is not set — copy .env.example to .env",
-    );
-  }
-
   const params = new URLSearchParams({
     q: cityName,
     limit: String(limit),
-    appid: APP_ID,
+    appid: requireAppId(),
   });
 
   const response = await fetch(`${GEO_BASE_URL}?${params.toString()}`);
@@ -137,22 +138,24 @@ export async function geoCordinatesByCityName(
   return response.json() as Promise<GeoLocation[]>;
 }
 
+/**
+ * Fetches current weather conditions for the given coordinates.
+ *
+ * @param lat Latitude.
+ * @param lon Longitude.
+ * @param units Unit system for temperature and wind speed.
+ * @throws {WeatherApiError} If the API responds with a non-2xx status.
+ */
 export async function getCurrentWeatherData(
   lat: number,
   lon: number,
   units: "standard" | "metric" | "imperial" = "metric",
 ): Promise<CurrentWeatherData> {
-  if (!APP_ID) {
-    throw new Error(
-      "EXPO_PUBLIC_OPENWEATHERMAP_APP_ID is not set — copy .env.example to .env",
-    );
-  }
-
   const params = new URLSearchParams({
     lat: String(lat),
     lon: String(lon),
     units,
-    appid: APP_ID,
+    appid: requireAppId(),
   });
 
   const response = await fetch(`${CURRENT_WEATHER_BASE_URL}?${params.toString()}`);
@@ -165,24 +168,27 @@ export async function getCurrentWeatherData(
   return response.json() as Promise<CurrentWeatherData>;
 }
 
+/**
+ * Fetches the 5-day forecast (3-hour steps) for the given coordinates.
+ *
+ * @param lat Latitude.
+ * @param lon Longitude.
+ * @param count Number of 3-hour timestamps to return (max 40).
+ * @param units Unit system for temperature and wind speed.
+ * @throws {WeatherApiError} If the API responds with a non-2xx status.
+ */
 export async function getForecastByCoordinates(
   lat: number,
   lon: number,
   count: number = 16,
   units: "standard" | "metric" | "imperial" = "metric",
 ): Promise<ForecastData> {
-  if (!APP_ID) {
-    throw new Error(
-      "EXPO_PUBLIC_OPENWEATHERMAP_APP_ID is not set — copy .env.example to .env",
-    );
-  }
-
   const params = new URLSearchParams({
     lat: String(lat),
     lon: String(lon),
     cnt: String(count),
     units,
-    appid: APP_ID,
+    appid: requireAppId(),
   });
 
   const response = await fetch(`${FORECAST_BASE_URL}?${params.toString()}`);

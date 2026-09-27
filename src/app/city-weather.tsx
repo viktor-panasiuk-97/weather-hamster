@@ -39,10 +39,6 @@ function TableRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-/* Response example
- {"data": {"base": "stations", "clouds": {"all": 49}, "cod": 200, "coord": {"lat": 50.7451, "lon": 25.3201}, "dt": 1790245559, "id": 702569, "main": {"feels_like": 13.49, "grnd_level": 990, "humidity": 55, "pressure": 1014, "sea_level": 1014, "temp": 14.54, "temp_max": 14.54, "temp_min": 14.54}, "name": "Lutsk", "sys": {"country": "UA", "sunrise": 1790222854, "sunset": 1790266447}, "timezone": 10800, "visibility": 10000, "weather": [[Object]], "wind": {"deg": 287, "gust": 12.03, "speed": 6.2}}, "latestUpdateTimeStamp": 1790246036287}
-*/
-
 function WeatherTable({
   data,
   latestUpdateTimeStamp,
