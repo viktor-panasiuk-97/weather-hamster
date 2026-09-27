@@ -1,4 +1,5 @@
 import type { CurrentWeatherData } from "@/api/weather-api";
+import { DaysForecast } from "@/components/days-forecast";
 import { WeatherHamster } from "@/components/weather-hamster";
 import { getCitiesWeather } from "@/store/current-weather-in-cities";
 import { getHamsterVariant } from "@/utils";
@@ -7,6 +8,7 @@ import { useEffect, useState, } from "react";
 import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -48,8 +50,6 @@ function WeatherTable({
   data: CurrentWeatherData;
   latestUpdateTimeStamp: number;
 }) {
-  const weather = data.weather[0];
-
   return (
     <View style={styles.table}>
       <TableRow label="Humidity" value={`${data.main.humidity}%`} />
@@ -83,14 +83,33 @@ export default function CityWeather() {
 
   const { height } = useWindowDimensions();
   const translateY = useSharedValue(0);
+  const scrollY = useSharedValue(0);
+  const startedAtTop = useSharedValue(false);
 
+  const scrollHandler = useAnimatedScrollHandler((e) => {
+    scrollY.value = e.contentOffset.y;
+  });
+
+  const scroll = Gesture.Native();
+
+  // Swipe-down dismiss only applies when the drag starts with the content scrolled to the top;
+  // otherwise the drag belongs to the ScrollView.
   const pan = Gesture.Pan()
     .activeOffsetY(10)
     .failOffsetX([-10, 10])
+    .simultaneousWithExternalGesture(scroll)
+    .onStart(() => {
+      startedAtTop.value = scrollY.value <= 0;
+    })
     .onUpdate((e) => {
-      translateY.value = Math.max(0, e.translationY);
+      if (startedAtTop.value) {
+        translateY.value = Math.max(0, e.translationY);
+      }
     })
     .onEnd((e) => {
+      if (!startedAtTop.value) {
+        return;
+      }
       if (translateY.value > height * 0.25 || e.velocityY > 800) {
         scheduleOnRN(goHome);
       } else {
@@ -110,6 +129,14 @@ export default function CityWeather() {
         style={styles.background}
         resizeMode="repeat"
       >
+      <GestureDetector gesture={scroll}>
+      <Animated.ScrollView
+        contentContainerStyle={styles.content}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        bounces={false}
+        overScrollMode="never"
+      >
       {weather ? (
         <>
           <Text style={styles.cityName}>{weather.data.name}</Text>
@@ -125,10 +152,13 @@ export default function CityWeather() {
             </Text>
           </View>
           <WeatherTable data={weather.data} latestUpdateTimeStamp={weather.latestUpdateTimeStamp} />
+          <DaysForecast lat={weather.data.coord.lat} lon={weather.data.coord.lon} />
         </>
       ) : (
         <Text style={styles.loading}>Loading…</Text>
       )}
+      </Animated.ScrollView>
+      </GestureDetector>
       </ImageBackground>
     </Animated.View>
     </GestureDetector>
@@ -141,6 +171,8 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
+  },
+  content: {
     padding: 16,
   },
   loading: {
