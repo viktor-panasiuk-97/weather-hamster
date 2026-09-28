@@ -1,5 +1,6 @@
-import { requireAppId } from "@/constants/env";
+import { FetchHttpClient, HttpError, type HttpClient, type QueryParams } from "@/api/http-client";
 import type { CurrentWeatherData, ForecastData, GeoLocation } from "@/api/weather-api.types";
+import { requireAppId } from "@/constants/env";
 
 export type { CurrentWeatherData, ForecastData, ForecastItem, GeoLocation } from "@/api/weather-api.types";
 
@@ -7,17 +8,30 @@ const GEO_BASE_URL = "https://api.openweathermap.org/geo/1.0/direct";
 const CURRENT_WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 const FORECAST_BASE_URL = "https://api.openweathermap.org/data/2.5/forecast";
 
-export class WeatherApiError extends Error {
-  status: number;
-  statusText: string;
-  body: string;
-
+export class WeatherApiError extends HttpError {
   constructor(status: number, statusText: string, body: string) {
-    super(`Weather API error ${status} ${statusText}`);
+    super(status, statusText, body, `Weather API error ${status} ${statusText}`);
     this.name = "WeatherApiError";
-    this.status = status;
-    this.statusText = statusText;
-    this.body = body;
+  }
+}
+
+let httpClient: HttpClient = new FetchHttpClient();
+
+/**
+ * Replaces the HTTP adapter used for all weather API requests (e.g. for mocks or another transport).
+ */
+export function setWeatherHttpClient(client: HttpClient): void {
+  httpClient = client;
+}
+
+async function request<T>(url: string, params: QueryParams): Promise<T> {
+  try {
+    return await httpClient.get<T>(url, { ...params, appid: requireAppId() });
+  } catch (error) {
+    if (error instanceof HttpError) {
+      throw new WeatherApiError(error.status, error.statusText, error.body);
+    }
+    throw error;
   }
 }
 
@@ -32,20 +46,7 @@ export async function geoCordinatesByCityName(
   cityName: string,
   limit: number = 10,
 ): Promise<GeoLocation[]> {
-  const params = new URLSearchParams({
-    q: cityName,
-    limit: String(limit),
-    appid: requireAppId(),
-  });
-
-  const response = await fetch(`${GEO_BASE_URL}?${params.toString()}`);
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new WeatherApiError(response.status, response.statusText, body);
-  }
-
-  return response.json() as Promise<GeoLocation[]>;
+  return request<GeoLocation[]>(GEO_BASE_URL, { q: cityName, limit });
 }
 
 /**
@@ -61,21 +62,7 @@ export async function getCurrentWeatherData(
   lon: number,
   units: "standard" | "metric" | "imperial" = "metric",
 ): Promise<CurrentWeatherData> {
-  const params = new URLSearchParams({
-    lat: String(lat),
-    lon: String(lon),
-    units,
-    appid: requireAppId(),
-  });
-
-  const response = await fetch(`${CURRENT_WEATHER_BASE_URL}?${params.toString()}`);
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new WeatherApiError(response.status, response.statusText, body);
-  }
-
-  return response.json() as Promise<CurrentWeatherData>;
+  return request<CurrentWeatherData>(CURRENT_WEATHER_BASE_URL, { lat, lon, units });
 }
 
 /**
@@ -93,20 +80,5 @@ export async function getForecastByCoordinates(
   count: number = 16,
   units: "standard" | "metric" | "imperial" = "metric",
 ): Promise<ForecastData> {
-  const params = new URLSearchParams({
-    lat: String(lat),
-    lon: String(lon),
-    cnt: String(count),
-    units,
-    appid: requireAppId(),
-  });
-
-  const response = await fetch(`${FORECAST_BASE_URL}?${params.toString()}`);
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new WeatherApiError(response.status, response.statusText, body);
-  }
-
-  return response.json() as Promise<ForecastData>;
+  return request<ForecastData>(FORECAST_BASE_URL, { lat, lon, cnt: count, units });
 }
