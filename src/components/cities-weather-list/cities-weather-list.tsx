@@ -1,10 +1,10 @@
-import { getCurrentWeatherData, type CurrentWeatherData, type GeoLocation } from "@/api/weather-api";
+import { getCurrentWeatherData, type GeoLocation } from "@/api/weather-api";
 import { CityCard } from "@/components/cities-weather-list/city-card";
-import { useCities } from "@/context/cities";
 import { useLoader } from "@/context/loader";
-import { getCities, removeCities } from "@/store/cities";
-import { getCitiesWeather, setCityWeather } from "@/store/current-weather-in-cities";
-import { useEffect, useState } from "react";
+import { useCitiesStore } from "@/store/cities";
+import { useCurrentWeatherStore } from "@/store/current-weather-in-cities";
+import { useStoresHydrated } from "@/store/use-stores-hydrated";
+import { useEffect } from "react";
 import { ScrollView, StyleProp, StyleSheet, ViewStyle } from "react-native";
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
@@ -18,53 +18,41 @@ type CitiesWeatherListProps = {
 };
 
 export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
-  const { cities, setCities } = useCities();
+  const cities = useCitiesStore((state) => state.cities);
+  const removeCity = useCitiesStore((state) => state.removeCity);
+  const weatherByCity = useCurrentWeatherStore((state) => state.weatherByCity);
+  const hydrated = useStoresHydrated();
   const { showLoader, hideLoader } = useLoader();
-  const [weatherByCity, setWeatherByCity] = useState<Record<string, CurrentWeatherData>>({});
 
   useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
     showLoader();
 
-    getCities().then(async (cities) => {
-      setCities(cities);
+    const { weatherByCity, setCityWeather } = useCurrentWeatherStore.getState();
 
-      const cityNames = cities.map(cityKey);
-      const citiesWeather = await getCitiesWeather(cityNames);
+    Promise.all(
+      cities.map(async (city) => {
+        const cityName = cityKey(city);
+        const existing = weatherByCity[cityName];
 
-      setWeatherByCity(
-        Object.fromEntries(
-          Object.entries(citiesWeather).map(([name, { data }]) => [name, data]),
-        ),
-      );
+        if (existing && Date.now() - existing.latestUpdateTimeStamp < FIVE_MINUTES_MS) {
+          return;
+        }
 
-      await Promise.all(
-        cities.map(async (city) => {
-          const cityName = cityKey(city);
-          const existing = citiesWeather[cityName];
-
-          if (existing && Date.now() - existing.latestUpdateTimeStamp < FIVE_MINUTES_MS) {
-            return;
-          }
-
-          const data = await getCurrentWeatherData(city.lat, city.lon);
-          setCityWeather(cityName, data, Date.now());
-          setWeatherByCity((prev) => ({ ...prev, [cityName]: data }));
-        }),
-      );
-    })
-    .finally(hideLoader);
-  }, [cities.length, setCities, showLoader, hideLoader]);
-
-  async function handleDelete(city: GeoLocation) {
-    await removeCities([city]);
-    setCities(cities.filter((c) => c.lat !== city.lat || c.lon !== city.lon));
-  }
+        const data = await getCurrentWeatherData(city.lat, city.lon);
+        setCityWeather(cityName, data, Date.now());
+      }),
+    ).finally(hideLoader);
+  }, [hydrated, cities, showLoader, hideLoader]);
 
   return (
     <ScrollView style={style} contentContainerStyle={styles.content}>
       {cities.map((city) => {
         const key = cityKey(city);
-        const data = weatherByCity[key];
+        const data = weatherByCity[key]?.data;
 
         return data ? (
           <CityCard
@@ -72,7 +60,7 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
             city={city}
             data={data}
             locationKey={key}
-            onDelete={() => handleDelete(city)}
+            onDelete={() => removeCity(city)}
           />
         ) : null;
       })}

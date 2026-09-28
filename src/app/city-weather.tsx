@@ -1,10 +1,9 @@
 import type { CurrentWeatherData } from "@/api/weather-api";
 import { DaysForecast } from "@/components/days-forecast";
 import { WeatherHamster } from "@/components/weather-hamster";
-import { getCitiesWeather } from "@/store/current-weather-in-cities";
+import { useCurrentWeatherStore } from "@/store/current-weather-in-cities";
 import { getHamsterVariant } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState, } from "react";
 import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -63,20 +62,7 @@ function WeatherTable({
 
 export default function CityWeather() {
   const { locationKey } = useLocalSearchParams<{ locationKey: string }>();
-  const [weather, setWeather] = useState<{
-    data: CurrentWeatherData;
-    latestUpdateTimeStamp: number;
-  } | null>(null);
-
-  useEffect(() => {
-    if (!locationKey) {
-      return;
-    }
-
-    getCitiesWeather([locationKey]).then((weather) => {
-      setWeather(weather[locationKey] ?? null);
-    });
-  }, [locationKey]);
+  const weather = useCurrentWeatherStore((state) => state.weatherByCity[locationKey]);
 
   const { height } = useWindowDimensions();
   const translateY = useSharedValue(0);

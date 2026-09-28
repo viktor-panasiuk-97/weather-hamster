@@ -5,8 +5,7 @@ import { CloseButton } from "@/components/search-cities/close-button";
 import { NotFound } from "@/components/search-cities/not-found";
 import { Option } from "@/components/search-cities/option";
 import { SearchInput } from "@/components/ui/search-input";
-import { useCities } from "@/context/cities";
-import { addCities } from "@/store/cities";
+import { useCitiesStore } from "@/store/cities";
 import { debounce } from "@/utils/debounce";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -24,7 +23,7 @@ type SearchCitiesProps = {
 };
 
 export function SearchCities({ style }: SearchCitiesProps) {
-  const { cities, setCities } = useCities();
+  const addCity = useCitiesStore((state) => state.addCity);
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState<GeoLocation[]>([]);
@@ -68,10 +67,9 @@ export function SearchCities({ style }: SearchCitiesProps) {
     latestQueryRef.current = "";
   }
 
-  async function handleSelect(location: GeoLocation) {
+  function handleSelect(location: GeoLocation) {
     handleClose();
-    addCities([location])
-    setCities([...cities, location]);
+    addCity(location);
   }
 
   return (
