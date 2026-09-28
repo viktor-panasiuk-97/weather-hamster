@@ -12,7 +12,6 @@ type CitiesContextValue = {
   cities: GeoLocation[];
   isLoading: boolean;
   setCities: Dispatch<SetStateAction<GeoLocation[]>>;
-  setIsLoading: Dispatch<SetStateAction<boolean>>;
 };
 
 const CitiesContext = createContext<CitiesContextValue | null>(null);
@@ -23,10 +22,10 @@ type CitiesProviderProps = {
 
 export function CitiesProvider({ children }: CitiesProviderProps) {
   const [cities, setCities] = useState<GeoLocation[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading] = useState(true);
 
   return (
-    <CitiesContext value={{ cities, isLoading, setCities, setIsLoading }}>
+    <CitiesContext value={{ cities, isLoading, setCities }}>
       {children}
     </CitiesContext>
   );

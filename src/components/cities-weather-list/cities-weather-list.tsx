@@ -17,13 +17,12 @@ type CitiesWeatherListProps = {
 };
 
 export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
-  const { cities, setCities, setIsLoading } = useCities();
+  const { cities, setCities } = useCities();
   const [weatherByCity, setWeatherByCity] = useState<Record<string, CurrentWeatherData>>({});
 
   useEffect(() => {
     getCities().then(async (cities) => {
       setCities(cities);
-      setIsLoading(false);
 
       const cityNames = cities.map(cityKey);
       const citiesWeather = await getCitiesWeather(cityNames);
@@ -34,21 +33,24 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
         ),
       );
 
-      cities.forEach((city) => {
-        const cityName = cityKey(city);
-        const existing = citiesWeather[cityName];
+      await Promise.all(
+        cities.map(async (city) => {
+          const cityName = cityKey(city);
+          const existing = citiesWeather[cityName];
 
-        if (existing && Date.now() - existing.latestUpdateTimeStamp < FIVE_MINUTES_MS) {
-          return;
-        }
+          if (existing && Date.now() - existing.latestUpdateTimeStamp < FIVE_MINUTES_MS) {
+            return;
+          }
 
-        getCurrentWeatherData(city.lat, city.lon).then((data) => {
+          const data = await getCurrentWeatherData(city.lat, city.lon);
           setCityWeather(cityName, data, Date.now());
           setWeatherByCity((prev) => ({ ...prev, [cityName]: data }));
-        });
+        }),
+      ).finally(() => {
+        console.log("Cities weather update finished");
       });
     });
-  }, [cities.length, setCities, setIsLoading]);
+  }, [cities.length, setCities]);
 
   async function handleDelete(city: GeoLocation) {
     await removeCities([city]);
