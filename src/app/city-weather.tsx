@@ -7,6 +7,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState, } from "react";
 import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
@@ -125,6 +126,7 @@ export default function CityWeather() {
         style={styles.background}
         resizeMode="repeat"
       >
+      <SafeAreaView style={styles.safeArea}>
       <GestureDetector gesture={scroll}>
       <Animated.ScrollView
         contentContainerStyle={styles.content}
@@ -155,6 +157,7 @@ export default function CityWeather() {
       )}
       </Animated.ScrollView>
       </GestureDetector>
+      </SafeAreaView>
       </ImageBackground>
     </Animated.View>
     </GestureDetector>
@@ -166,6 +169,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   background: {
+    flex: 1,
+  },
+  safeArea: {
     flex: 1,
   },
   content: {

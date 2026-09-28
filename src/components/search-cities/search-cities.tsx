@@ -17,6 +17,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type SearchCitiesProps = {
   style?: StyleProp<ViewStyle>;
@@ -90,7 +91,7 @@ export function SearchCities({ style }: SearchCitiesProps) {
           onRequestClose={handleClose}
           backdropColor="#121212"
         >
-          <View style={styles.modalContent}>
+          <SafeAreaView style={styles.modalContent}>
             <View style={styles.modalInputWrapper}>
               <View style={styles.searchInputFlex}>
                 <SearchInput
@@ -120,7 +121,7 @@ export function SearchCities({ style }: SearchCitiesProps) {
                 )}
               </View>
             )}
-          </View>
+          </SafeAreaView>
         </Modal>
       )}
     </View>
