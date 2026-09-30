@@ -10,6 +10,7 @@ import { debounce } from "@/utils/debounce";
 import { useEffect, useRef, useState } from "react";
 import {
   Modal,
+  Pressable,
   ScrollView,
   StyleProp,
   StyleSheet,
@@ -62,10 +63,14 @@ export function SearchCities({ style }: SearchCitiesProps) {
     setIsOpen(true);
   }
 
-  // autoFocus alone doesn't reliably raise the keyboard inside a Modal,
-  // so focus explicitly once the modal is visible.
+  // On Android, an input focused while the Modal window is still appearing
+  // (e.g. via autoFocus) gets a caret but the soft keyboard never opens, since
+  // the window doesn't have input focus yet. So focus explicitly, after the
+  // modal has settled.
   function handleModalShow() {
-    modalInputRef.current?.focus();
+    setTimeout(() => {
+      modalInputRef.current?.focus();
+    }, 300);
   }
 
   function handleClose() {
@@ -83,11 +88,14 @@ export function SearchCities({ style }: SearchCitiesProps) {
   return (
     <View style={style}>
       {!isOpen && (
-        <SearchInput
-          value={query}
-          onChangeText={handleChangeText}
-          onFocus={handleFocus}
-        />
+        // The inline input is only a trigger. If it took real focus and was
+        // then unmounted, the keyboard would be dismissed right as the modal
+        // input tries to open it.
+        <Pressable onPress={handleFocus} accessibilityRole="search">
+          <View pointerEvents="none">
+            <SearchInput value={query} editable={false} />
+          </View>
+        </Pressable>
       )}
       {isOpen && (
         <Modal
@@ -105,7 +113,6 @@ export function SearchCities({ style }: SearchCitiesProps) {
                   onChangeText={handleChangeText}
                   onFocus={handleFocus}
                   inputRef={modalInputRef}
-                  autoFocus
                 />
               </View>
               <CloseButton onPress={handleClose} />
