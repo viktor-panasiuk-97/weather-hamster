@@ -19,6 +19,23 @@ export const en = {
       visibility: "{{value}} m",
     },
   },
+  forecast: {
+    loading: "Loading forecast…",
+    loadError: "Failed to load forecast",
+    time: "Time",
+    temp: "Temp",
+    weather: "Weather",
+    rain: "Rain",
+    weekdays: {
+      sun: "Sun",
+      mon: "Mon",
+      tue: "Tue",
+      wed: "Wed",
+      thu: "Thu",
+      fri: "Fri",
+      sat: "Sat",
+    },
+  },
   // Keyed by OpenWeatherMap condition id: https://openweathermap.org/weather-conditions
   weatherConditions: {
     "200": "Thunderstorm with light rain",

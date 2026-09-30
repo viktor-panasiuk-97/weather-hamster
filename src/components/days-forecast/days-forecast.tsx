@@ -1,5 +1,6 @@
 import { getForecastByCoordinates, type ForecastData, type ForecastItem } from "@/api/weather-api";
 import { getLocalizedWeatherDescription } from "@/utils";
+import type { TFunction } from "i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
@@ -10,15 +11,17 @@ type ForecastDay = {
   items: ForecastItem[];
 };
 
-function formatForecastTime(unixSeconds: number) {
-  return new Date(unixSeconds * 1000).toLocaleTimeString([], {
+const WEEKDAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+
+function formatForecastTime(unixSeconds: number, locale: string) {
+  return new Date(unixSeconds * 1000).toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   });
 }
 
 // The API returns items in chronological order, so consecutive items with the same date form a day.
-function groupByDay(list: ForecastItem[]): ForecastDay[] {
+function groupByDay(list: ForecastItem[], t: TFunction): ForecastDay[] {
   const days: ForecastDay[] = [];
 
   for (const item of list) {
@@ -31,7 +34,7 @@ function groupByDay(list: ForecastItem[]): ForecastDay[] {
     } else {
       days.push({
         key,
-        label: date.toLocaleDateString([], { weekday: "short" }),
+        label: t(`forecast.weekdays.${WEEKDAY_KEYS[date.getDay()]}`),
         items: [item],
       });
     }
@@ -43,7 +46,7 @@ function groupByDay(list: ForecastItem[]): ForecastDay[] {
 export function DaysForecast({ lat, lon }: { lat: number; lon: number }) {
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     let ignore = false;
@@ -56,7 +59,7 @@ export function DaysForecast({ lat, lon }: { lat: number; lon: number }) {
       })
       .catch((e: unknown) => {
         if (!ignore) {
-          setError(e instanceof Error ? e.message : "Failed to load forecast");
+          setError(e instanceof Error ? e.message : "");
         }
       });
 
@@ -65,30 +68,32 @@ export function DaysForecast({ lat, lon }: { lat: number; lon: number }) {
     };
   }, [lat, lon]);
 
-  if (error) {
-    return <Text style={styles.message}>{error}</Text>;
+  if (error !== null) {
+    return <Text style={styles.message}>{error || t("forecast.loadError")}</Text>;
   }
 
   if (!forecast) {
-    return <Text style={styles.message}>Loading forecast…</Text>;
+    return <Text style={styles.message}>{t("forecast.loading")}</Text>;
   }
 
   return (
     <View style={styles.table}>
       <View style={[styles.row, styles.headerRow]}>
-        <Text style={[styles.cell, styles.timeCell, styles.headerText]}>Time</Text>
-        <Text style={[styles.cell, styles.headerText]}>Temp</Text>
-        <Text style={[styles.cell, styles.weatherCell, styles.headerText]}>Weather</Text>
-        <Text style={[styles.cell, styles.headerText]}>Rain</Text>
+        <Text style={[styles.cell, styles.timeCell, styles.headerText]}>{t("forecast.time")}</Text>
+        <Text style={[styles.cell, styles.headerText]}>{t("forecast.temp")}</Text>
+        <Text style={[styles.cell, styles.weatherCell, styles.headerText]}>
+          {t("forecast.weather")}
+        </Text>
+        <Text style={[styles.cell, styles.headerText]}>{t("forecast.rain")}</Text>
       </View>
-      {groupByDay(forecast.list).map((day) => (
+      {groupByDay(forecast.list, t).map((day) => (
         <View key={day.key}>
           <View style={[styles.row, styles.dayRow]}>
             <Text style={styles.dayText}>{day.label}</Text>
           </View>
           {day.items.map((item) => (
             <View key={item.dt} style={styles.row}>
-              <Text style={[styles.cell, styles.timeCell]}>{formatForecastTime(item.dt)}</Text>
+              <Text style={[styles.cell, styles.timeCell]}>{formatForecastTime(item.dt, i18n.language)}</Text>
               <Text style={styles.cell}>{Math.round(item.main.temp)}°C</Text>
               <Text style={[styles.cell, styles.weatherCell]} numberOfLines={1}>
                 {getLocalizedWeatherDescription(item.weather[0], t)}

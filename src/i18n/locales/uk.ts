@@ -21,6 +21,23 @@ export const uk: TranslationResources = {
       visibility: "{{value}} м",
     },
   },
+  forecast: {
+    loading: "Завантаження прогнозу…",
+    loadError: "Не вдалося завантажити прогноз",
+    time: "Час",
+    temp: "Темп.",
+    weather: "Погода",
+    rain: "Дощ",
+    weekdays: {
+      sun: "Нд",
+      mon: "Пн",
+      tue: "Вт",
+      wed: "Ср",
+      thu: "Чт",
+      fri: "Пт",
+      sat: "Сб",
+    },
+  },
   weatherConditions: {
     "200": "Гроза з невеликим дощем",
     "201": "Гроза з дощем",
