@@ -4,6 +4,7 @@ import { WeatherHamster } from "@/components/weather-hamster";
 import { useCurrentWeatherStore } from "@/store/current-weather-in-cities";
 import { getHamsterVariant } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,8 +24,8 @@ function goHome() {
   }
 }
 
-function formatTime(unixSeconds: number) {
-  return new Date(unixSeconds * 1000).toLocaleTimeString([], {
+function formatTime(unixSeconds: number, locale: string) {
+  return new Date(unixSeconds * 1000).toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -46,16 +47,30 @@ function WeatherTable({
   data: CurrentWeatherData;
   latestUpdateTimeStamp: number;
 }) {
+  const { t, i18n } = useTranslation();
+
   return (
     <View style={styles.table}>
-      <TableRow label="Humidity" value={`${data.main.humidity}%`} />
-      <TableRow label="Pressure" value={`${data.main.pressure} hPa`} />
-      <TableRow label="Wind" value={`${data.wind.speed} m/s, ${data.wind.deg}°`} />
-      <TableRow label="Clouds" value={`${data.clouds.all}%`} />
-      <TableRow label="Visibility" value={`${data.visibility} m`} />
-      <TableRow label="Sunrise" value={formatTime(data.sys.sunrise)} />
-      <TableRow label="Sunset" value={formatTime(data.sys.sunset)} />
-      <TableRow label="Updated" value={new Date(latestUpdateTimeStamp).toLocaleTimeString()} />
+      <TableRow label={t("cityWeather.humidity")} value={`${data.main.humidity}%`} />
+      <TableRow
+        label={t("cityWeather.pressure")}
+        value={t("cityWeather.units.pressure", { value: data.main.pressure })}
+      />
+      <TableRow
+        label={t("cityWeather.wind")}
+        value={t("cityWeather.units.wind", { speed: data.wind.speed, deg: data.wind.deg })}
+      />
+      <TableRow label={t("cityWeather.clouds")} value={`${data.clouds.all}%`} />
+      <TableRow
+        label={t("cityWeather.visibility")}
+        value={t("cityWeather.units.visibility", { value: data.visibility })}
+      />
+      <TableRow label={t("cityWeather.sunrise")} value={formatTime(data.sys.sunrise, i18n.language)} />
+      <TableRow label={t("cityWeather.sunset")} value={formatTime(data.sys.sunset, i18n.language)} />
+      <TableRow
+        label={t("cityWeather.updated")}
+        value={new Date(latestUpdateTimeStamp).toLocaleTimeString(i18n.language)}
+      />
     </View>
   );
 }
@@ -63,6 +78,7 @@ function WeatherTable({
 export default function CityWeather() {
   const { locationKey } = useLocalSearchParams<{ locationKey: string }>();
   const weather = useCurrentWeatherStore((state) => state.weatherByCity[locationKey]);
+  const { t } = useTranslation();
 
   const { height } = useWindowDimensions();
   const translateY = useSharedValue(0);
@@ -132,14 +148,18 @@ export default function CityWeather() {
             <Text style={styles.condition}>{weather.data.weather[0]?.description ?? "—"}</Text>
             <Text style={styles.currentTemp}>{Math.round(weather.data.main.temp)}°C</Text>
             <Text style={styles.subInfo}>
-              Feels like {Math.round(weather.data.main.feels_like)}°C | Min {Math.round(weather.data.main.temp_min)}° / Max {Math.round(weather.data.main.temp_max)}°
+              {t("cityWeather.summary", {
+                feelsLike: Math.round(weather.data.main.feels_like),
+                min: Math.round(weather.data.main.temp_min),
+                max: Math.round(weather.data.main.temp_max),
+              })}
             </Text>
           </View>
           <WeatherTable data={weather.data} latestUpdateTimeStamp={weather.latestUpdateTimeStamp} />
           <DaysForecast lat={weather.data.coord.lat} lon={weather.data.coord.lon} />
         </>
       ) : (
-        <Text style={styles.loading}>Loading…</Text>
+        <Text style={styles.loading}>{t("cityWeather.loading")}</Text>
       )}
       </Animated.ScrollView>
       </GestureDetector>
