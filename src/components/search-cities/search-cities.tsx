@@ -13,6 +13,7 @@ import {
   ScrollView,
   StyleProp,
   StyleSheet,
+  TextInput,
   View,
   ViewStyle,
 } from "react-native";
@@ -27,6 +28,7 @@ export function SearchCities({ style }: SearchCitiesProps) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState<GeoLocation[]>([]);
+  const modalInputRef = useRef<TextInput>(null);
   const latestQueryRef = useRef("");
   const runSearchRef = useRef<((searchQuery: string) => void) | null>(null);
 
@@ -60,6 +62,12 @@ export function SearchCities({ style }: SearchCitiesProps) {
     setIsOpen(true);
   }
 
+  // autoFocus alone doesn't reliably raise the keyboard inside a Modal,
+  // so focus explicitly once the modal is visible.
+  function handleModalShow() {
+    modalInputRef.current?.focus();
+  }
+
   function handleClose() {
     setIsOpen(false);
     setQuery("");
@@ -86,6 +94,7 @@ export function SearchCities({ style }: SearchCitiesProps) {
           visible
           animationType="fade"
           onRequestClose={handleClose}
+          onShow={handleModalShow}
           backdropColor="#121212"
         >
           <SafeAreaView style={styles.modalContent}>
@@ -95,6 +104,7 @@ export function SearchCities({ style }: SearchCitiesProps) {
                   value={query}
                   onChangeText={handleChangeText}
                   onFocus={handleFocus}
+                  inputRef={modalInputRef}
                   autoFocus
                 />
               </View>
