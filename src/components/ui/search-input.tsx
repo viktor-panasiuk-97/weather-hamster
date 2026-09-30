@@ -1,11 +1,20 @@
 // Specs: @specs/components/ui/search-input.md
 
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from "react-native";
 
-export function SearchInput({ style, ...props }: TextInputProps) {
+export function SearchInput({ style, placeholder, ...props }: TextInputProps) {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t("common.searchFieldPlaceholder");
+
   return (
     <View style={styles.container}>
-      <TextInput accessibilityLabel={props.placeholder ?? "Search"} style={[styles.input, style]} {...props} />
+      <TextInput
+        accessibilityLabel={resolvedPlaceholder}
+        placeholder={resolvedPlaceholder}
+        style={[styles.input, style]}
+        {...props}
+      />
       <Text style={styles.icon} accessibilityElementsHidden={true} importantForAccessibility="no-hide-descendants">🔍</Text>
     </View>
   );

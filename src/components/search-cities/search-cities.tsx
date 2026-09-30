@@ -79,7 +79,6 @@ export function SearchCities({ style }: SearchCitiesProps) {
           value={query}
           onChangeText={handleChangeText}
           onFocus={handleFocus}
-          placeholder="Search for a city"
         />
       )}
       {isOpen && (
@@ -96,7 +95,6 @@ export function SearchCities({ style }: SearchCitiesProps) {
                   value={query}
                   onChangeText={handleChangeText}
                   onFocus={handleFocus}
-                  placeholder="Search for a city"
                   autoFocus
                 />
               </View>

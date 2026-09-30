@@ -1,3 +1,4 @@
+import "@/i18n";
 import { LoaderProvider } from "@/context/loader";
 import { Stack } from "expo-router";
 import { ImageBackground, StyleSheet } from "react-native";
