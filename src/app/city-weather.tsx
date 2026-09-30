@@ -1,19 +1,20 @@
 import type { CurrentWeatherData } from "@/api/weather-api";
 import { DaysForecast } from "@/components/days-forecast";
 import { WeatherHamster } from "@/components/weather-hamster";
+import { useCitiesStore } from "@/store/cities";
 import { useCurrentWeatherStore } from "@/store/current-weather-in-cities";
-import { getHamsterVariant } from "@/utils";
+import { getCityKey, getHamsterVariant, getLocalizedCityName } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
 
 function goHome() {
@@ -78,7 +79,10 @@ function WeatherTable({
 export default function CityWeather() {
   const { locationKey } = useLocalSearchParams<{ locationKey: string }>();
   const weather = useCurrentWeatherStore((state) => state.weatherByCity[locationKey]);
-  const { t } = useTranslation();
+  const city = useCitiesStore((state) =>
+    state.cities.find((c) => getCityKey(c) === locationKey),
+  );
+  const { t, i18n } = useTranslation();
 
   const { height } = useWindowDimensions();
   const translateY = useSharedValue(0);
@@ -139,7 +143,9 @@ export default function CityWeather() {
       >
       {weather ? (
         <>
-          <Text style={styles.cityName}>{weather.data.name}</Text>
+          <Text style={styles.cityName}>
+            {city ? getLocalizedCityName(city, i18n.language) : weather.data.name}
+          </Text>
 
           <View style={styles.hamster}>
             <WeatherHamster variant={getHamsterVariant(weather.data.weather[0]?.icon)} size={150} />

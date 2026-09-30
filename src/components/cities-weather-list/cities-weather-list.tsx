@@ -1,17 +1,14 @@
-import { getCurrentWeatherData, type GeoLocation } from "@/api/weather-api";
+import { getCurrentWeatherData } from "@/api/weather-api";
 import { CityCard } from "@/components/cities-weather-list/city-card";
 import { useLoader } from "@/context/loader";
 import { useCitiesStore } from "@/store/cities";
 import { useCurrentWeatherStore } from "@/store/current-weather-in-cities";
 import { useStoresHydrated } from "@/store/use-stores-hydrated";
+import { getCityKey } from "@/utils";
 import { useEffect } from "react";
 import { ScrollView, StyleProp, StyleSheet, ViewStyle } from "react-native";
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
-
-function cityKey(city: GeoLocation) {
-  return `${city.name}_${city.state}_${city.country}`;
-}
 
 type CitiesWeatherListProps = {
   style?: StyleProp<ViewStyle>;
@@ -35,7 +32,7 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
 
     Promise.all(
       cities.map(async (city) => {
-        const cityName = cityKey(city);
+        const cityName = getCityKey(city);
         const existing = weatherByCity[cityName];
 
         if (existing && Date.now() - existing.latestUpdateTimeStamp < FIVE_MINUTES_MS) {
@@ -51,7 +48,7 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
   return (
     <ScrollView style={style} contentContainerStyle={styles.content}>
       {cities.map((city) => {
-        const key = cityKey(city);
+        const key = getCityKey(city);
         const data = weatherByCity[key]?.data;
 
         return data ? (
