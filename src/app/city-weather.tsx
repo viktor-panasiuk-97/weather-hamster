@@ -3,7 +3,7 @@ import { DaysForecast } from "@/components/days-forecast";
 import { WeatherHamster } from "@/components/weather-hamster";
 import { useCitiesStore } from "@/store/cities";
 import { useCurrentWeatherStore } from "@/store/current-weather-in-cities";
-import { getCityKey, getHamsterVariant, getLocalizedCityName } from "@/utils";
+import { getCityKey, getHamsterVariant, getLocalizedCityName, getLocalizedWeatherDescription } from "@/utils";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from "react-native";
@@ -151,7 +151,7 @@ export default function CityWeather() {
             <WeatherHamster variant={getHamsterVariant(weather.data.weather[0]?.icon)} size={150} />
           </View>
           <View style={styles.headline}>
-            <Text style={styles.condition}>{weather.data.weather[0]?.description ?? "—"}</Text>
+            <Text style={styles.condition}>{getLocalizedWeatherDescription(weather.data.weather[0], t)}</Text>
             <Text style={styles.currentTemp}>{Math.round(weather.data.main.temp)}°C</Text>
             <Text style={styles.subInfo}>
               {t("cityWeather.summary", {
@@ -212,7 +212,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#3a3a3c",
     marginTop: 4,
-    textTransform: "capitalize",
   },
   currentTemp: {
     fontSize: 48,

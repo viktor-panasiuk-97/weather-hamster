@@ -1,5 +1,7 @@
 import { getForecastByCoordinates, type ForecastData, type ForecastItem } from "@/api/weather-api";
+import { getLocalizedWeatherDescription } from "@/utils";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 
 type ForecastDay = {
@@ -41,6 +43,7 @@ function groupByDay(list: ForecastItem[]): ForecastDay[] {
 export function DaysForecast({ lat, lon }: { lat: number; lon: number }) {
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     let ignore = false;
@@ -88,7 +91,7 @@ export function DaysForecast({ lat, lon }: { lat: number; lon: number }) {
               <Text style={[styles.cell, styles.timeCell]}>{formatForecastTime(item.dt)}</Text>
               <Text style={styles.cell}>{Math.round(item.main.temp)}°C</Text>
               <Text style={[styles.cell, styles.weatherCell]} numberOfLines={1}>
-                {item.weather[0]?.description ?? "—"}
+                {getLocalizedWeatherDescription(item.weather[0], t)}
               </Text>
               <Text style={styles.cell}>{Math.round(item.pop * 100)}%</Text>
             </View>
@@ -131,7 +134,6 @@ const styles = StyleSheet.create({
   },
   weatherCell: {
     flex: 2,
-    textTransform: "capitalize",
   },
   dayRow: {
     backgroundColor: "#242426",

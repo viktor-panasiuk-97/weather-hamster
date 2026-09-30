@@ -1,7 +1,7 @@
 import type { CurrentWeatherData, GeoLocation } from "@/api/weather-api";
 import { RemoveCard } from "@/components/cities-weather-list/remove-card";
 import { WeatherHamsterIcon } from "@/components/weather-hamster-icon";
-import { getHamsterVariant, getLocalizedCityName } from "@/utils";
+import { getHamsterVariant, getLocalizedCityName, getLocalizedWeatherDescription } from "@/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -27,7 +27,7 @@ export function CityCard({
   locationKey: string;
   onDelete: () => void;
 }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const translateX = useSharedValue(0);
   const cardWidth = useSharedValue(0);
 
@@ -83,7 +83,7 @@ export function CityCard({
                     {getLocalizedCityName(city, i18n.language)}, {city.country}
                   </Text>
                   <Text style={styles.description} numberOfLines={1}>
-                    {data.weather[0]?.description}
+                    {getLocalizedWeatherDescription(data.weather[0], t)}
                   </Text>
                 </View>
                 <View style={styles.icon}>
@@ -128,7 +128,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 13,
     color: "#d1d1d6",
-    textTransform: "capitalize",
   },
   icon: {
     alignSelf: "center",
