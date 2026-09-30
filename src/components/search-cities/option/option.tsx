@@ -1,4 +1,6 @@
 import type { GeoLocation } from "@/api/weather-api";
+import { getLocalizedCityName } from "@/utils";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 export function Option({
@@ -8,12 +10,12 @@ export function Option({
   location: GeoLocation;
   onPress: () => void;
 }) {
-  console.log()
+  const { i18n } = useTranslation();
+  const label = `${getLocalizedCityName(location, i18n.language)}, ${location.country}`;
+
   return (
-    <Pressable onPress={onPress} style={styles.option} accessibilityRole="button" accessibilityLabel={`${location.name}, ${location.country}`}>
-      <Text style={styles.optionText}>
-        {location.local_names?.uk ?? location.name}, {location.country}
-      </Text>
+    <Pressable onPress={onPress} style={styles.option} accessibilityRole="button" accessibilityLabel={label}>
+      <Text style={styles.optionText}>{label}</Text>
     </Pressable>
   );
 }
