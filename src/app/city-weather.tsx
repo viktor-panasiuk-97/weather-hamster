@@ -21,7 +21,7 @@ const goHome = () => {
  * Detail screen for a single city: looks up its stored current weather and renders the headline,
  * details table and multi-day forecast inside a swipe-down-to-dismiss container.
  */
-export default function CityWeather() {
+export default function CityForecast() {
   const { locationKey } = useLocalSearchParams<{ locationKey: string }>();
   const weather = useCurrentWeatherStore((state) => state.weatherByCity[locationKey]);
   const city = useCitiesStore((state) =>

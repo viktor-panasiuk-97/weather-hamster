@@ -1,5 +1,3 @@
-// Specs: @specs/components/ui/search-input.md
-
 import { useTranslation } from "react-i18next";
 import type { Ref } from "react";
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from "react-native";

@@ -1,7 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text } from "react-native";
 
 export function NotFound() {
-  return <Text style={styles.notFound} accessibilityRole="text" accessibilityLiveRegion="polite">Not Found</Text>;
+  const { t } = useTranslation();
+
+  return <Text style={styles.notFound} accessibilityRole="text" accessibilityLiveRegion="polite">{t("common.notFound")}</Text>;
 }
 
 const styles = StyleSheet.create({

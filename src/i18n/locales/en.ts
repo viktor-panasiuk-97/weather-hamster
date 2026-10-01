@@ -1,6 +1,8 @@
 export const en = {
   common: {
     searchFieldPlaceholder: "Search for a city",
+    notFound: "Not Found",
+    closeSearch: "Close search",
   },
   cityWeather: {
     loading: "Loading…",

@@ -3,6 +3,8 @@ import type { TranslationResources } from "./en";
 export const uk: TranslationResources = {
   common: {
     searchFieldPlaceholder: "Пошук міста",
+    notFound: "Нічого не знайдено",
+    closeSearch: "Закрити пошук",
   },
   cityWeather: {
     loading: "Завантаження…",

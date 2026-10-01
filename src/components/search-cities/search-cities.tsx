@@ -1,10 +1,8 @@
-// Specs: @specs/components/search-cities.md
-
 import { geoCordinatesByCityName, type GeoLocation } from "@/api/weather-api";
 import { CloseButton } from "@/components/search-cities/close-button";
 import { NotFound } from "@/components/search-cities/not-found";
 import { Option } from "@/components/search-cities/option";
-import { SearchInput } from "@/components/ui/search-input";
+import { SearchInput } from "@/components/search-input";
 import { useCitiesStore } from "@/store/cities";
 import { debounce } from "@/utils/debounce";
 import { useEffect, useRef, useState } from "react";
