@@ -1,11 +1,11 @@
-import { geoCordinatesByCityName, type GeoLocation } from "@/api/weather-api";
+import { type GeoLocation } from "@/api/weather-api";
 import { CloseButton } from "@/components/search-cities/close-button";
 import { NotFound } from "@/components/search-cities/not-found";
 import { Option } from "@/components/search-cities/option";
+import { useCitySearch } from "@/components/search-cities/use-city-search";
 import { SearchInput } from "@/components/search-input";
 import { useCitiesStore } from "@/store/cities";
-import { debounce } from "@/utils/debounce";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -24,41 +24,9 @@ type SearchCitiesProps = {
 
 export function SearchCities({ style }: SearchCitiesProps) {
   const addCity = useCitiesStore((state) => state.addCity);
-  const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [results, setResults] = useState<GeoLocation[]>([]);
   const modalInputRef = useRef<TextInput>(null);
-  const latestQueryRef = useRef("");
-  const runSearchRef = useRef<((searchQuery: string) => void) | null>(null);
-
-  useEffect(() => {
-    runSearchRef.current = debounce((searchQuery: string) => {
-      geoCordinatesByCityName(searchQuery)
-        .then((locations) => {
-          if (latestQueryRef.current !== searchQuery) return;
-          const { cities } = useCitiesStore.getState();
-          setResults(
-            locations.filter((l) => !cities.some((c) => c.lat === l.lat && c.lon === l.lon)),
-          );
-        })
-        .catch(() => {
-          if (latestQueryRef.current !== searchQuery) return;
-          setResults([]);
-        });
-    }, 250);
-  }, []);
-
-  function handleChangeText(text: string) {
-    setQuery(text);
-    latestQueryRef.current = text;
-
-    if (text.trim().length === 0) {
-      setResults([]);
-      return;
-    }
-
-    runSearchRef.current?.(text);
-  }
+  const { query, results, search, reset } = useCitySearch();
 
   function handleFocus() {
     setIsOpen(true);
@@ -76,9 +44,7 @@ export function SearchCities({ style }: SearchCitiesProps) {
 
   function handleClose() {
     setIsOpen(false);
-    setQuery("");
-    setResults([]);
-    latestQueryRef.current = "";
+    reset();
   }
 
   function handleSelect(location: GeoLocation) {
@@ -111,7 +77,7 @@ export function SearchCities({ style }: SearchCitiesProps) {
               <View style={styles.searchInputFlex}>
                 <SearchInput
                   value={query}
-                  onChangeText={handleChangeText}
+                  onChangeText={search}
                   onFocus={handleFocus}
                   inputRef={modalInputRef}
                 />
