@@ -1,1 +1,1 @@
-export { DaysForecast } from "@/components/days-forecast/days-forecast";
+export { DaysForecast } from "./days-forecast";

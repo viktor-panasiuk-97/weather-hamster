@@ -1,1 +1,1 @@
-export { WeatherTable } from "@/components/weather-table/weather-table";
+export { WeatherTable } from "./weather-table";

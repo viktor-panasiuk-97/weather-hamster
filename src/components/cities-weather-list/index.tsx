@@ -1,1 +1,1 @@
-export { CitiesWeatherList } from "@/components/cities-weather-list/cities-weather-list";
+export { CitiesWeatherList } from "./cities-weather-list";

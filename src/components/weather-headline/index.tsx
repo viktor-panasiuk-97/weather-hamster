@@ -1,1 +1,1 @@
-export { WeatherHeadline } from "@/components/weather-headline/weather-headline";
+export { WeatherHeadline } from "./weather-headline";

@@ -1,1 +1,1 @@
-export * from "@/components/loader/loader";
+export * from "./loader";

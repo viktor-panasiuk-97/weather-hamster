@@ -1,1 +1,1 @@
-export * from "@/components/weather-hamster-icon/weather-hamster-icon";
+export * from "./weather-hamster-icon";

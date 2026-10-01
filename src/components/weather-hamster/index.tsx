@@ -1,2 +1,2 @@
-export * from "@/components/weather-hamster/weather-hamster";
+export * from "./weather-hamster";
 

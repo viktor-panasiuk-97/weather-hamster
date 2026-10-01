@@ -1,1 +1,1 @@
-export { DismissibleScreen } from "@/components/dismissible-screen/dismissible-screen";
+export { DismissibleScreen } from "./dismissible-screen";

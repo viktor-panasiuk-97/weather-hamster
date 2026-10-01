@@ -1,1 +1,1 @@
-export { SearchCities } from "@/components/search-cities/search-cities";
+export { SearchCities } from "./search-cities";
