@@ -36,7 +36,10 @@ export function SearchCities({ style }: SearchCitiesProps) {
       geoCordinatesByCityName(searchQuery)
         .then((locations) => {
           if (latestQueryRef.current !== searchQuery) return;
-          setResults(locations);
+          const { cities } = useCitiesStore.getState();
+          setResults(
+            locations.filter((l) => !cities.some((c) => c.lat === l.lat && c.lon === l.lon)),
+          );
         })
         .catch(() => {
           if (latestQueryRef.current !== searchQuery) return;
