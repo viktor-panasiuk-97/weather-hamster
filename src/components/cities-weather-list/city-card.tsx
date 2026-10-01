@@ -92,7 +92,10 @@ export function CityCard({
                 <View style={styles.rightColumn}>
                   <Text style={styles.currentTemp}>{Math.round(data.main.temp)}°</Text>
                   <Text style={styles.minMax}>
-                    H: {Math.round(data.main.temp_max)}°  L: {Math.round(data.main.temp_min)}°
+                    {t("cityWeather.highLow", {
+                      max: Math.round(data.main.temp_max),
+                      min: Math.round(data.main.temp_min),
+                    })}
                   </Text>
                 </View>
               </LinearGradient>

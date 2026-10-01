@@ -7,6 +7,7 @@ export const en = {
   cityWeather: {
     loading: "Loading…",
     summary: "Feels like {{feelsLike}}°C | Min {{min}}° / Max {{max}}°",
+    highLow: "H: {{max}}°  L: {{min}}°",
     humidity: "Humidity",
     pressure: "Pressure",
     wind: "Wind",

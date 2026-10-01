@@ -9,6 +9,7 @@ export const uk: TranslationResources = {
   cityWeather: {
     loading: "Завантаження…",
     summary: "Відчувається як {{feelsLike}}°C | Мін {{min}}° / Макс {{max}}°",
+    highLow: "В: {{max}}°  Н: {{min}}°",
     humidity: "Вологість",
     pressure: "Тиск",
     wind: "Вітер",
