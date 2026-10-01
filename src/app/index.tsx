@@ -1,29 +1,23 @@
+import { AppBackground } from "@/components/app-background";
 import { CitiesWeatherList } from "@/components/cities-weather-list";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { SearchCities } from "@/components/search-cities";
-import { ImageBackground, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   return (
-    <ImageBackground
-      source={require("@/assets/images/bg.jpg")}
-      style={styles.background}
-      resizeMode="repeat"
-    >
+    <AppBackground>
       <SafeAreaView style={styles.container}>
         <LanguageSwitcher style={styles.languageSwitcher} />
         <SearchCities style={styles.search} />
         <CitiesWeatherList style={styles.list} />
       </SafeAreaView>
-    </ImageBackground>
+    </AppBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     justifyContent: "flex-start",

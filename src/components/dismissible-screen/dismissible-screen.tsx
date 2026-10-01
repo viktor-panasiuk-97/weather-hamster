@@ -1,5 +1,6 @@
+import { AppBackground } from "@/components/app-background";
 import type { ReactNode } from "react";
-import { ImageBackground, StyleSheet, useWindowDimensions } from "react-native";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedScrollHandler,
@@ -64,11 +65,7 @@ export function DismissibleScreen({
   return (
     <GestureDetector gesture={pan}>
       <Animated.View style={[styles.container, containerStyle]}>
-        <ImageBackground
-          source={require("@/assets/images/bg.jpg")}
-          style={styles.background}
-          resizeMode="repeat"
-        >
+        <AppBackground>
           <SafeAreaView style={styles.safeArea}>
             <GestureDetector gesture={scroll}>
               <Animated.ScrollView
@@ -82,7 +79,7 @@ export function DismissibleScreen({
               </Animated.ScrollView>
             </GestureDetector>
           </SafeAreaView>
-        </ImageBackground>
+        </AppBackground>
       </Animated.View>
     </GestureDetector>
   );
@@ -90,9 +87,6 @@ export function DismissibleScreen({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  background: {
     flex: 1,
   },
   safeArea: {

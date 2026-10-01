@@ -1,18 +1,15 @@
 import "@/i18n";
+import { AppBackground } from "@/components/app-background";
 import { LoaderProvider } from "@/context/loader";
 import { Stack } from "expo-router";
-import { ImageBackground, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <LoaderProvider>
-        <ImageBackground
-          source={require("@/assets/images/bg.jpg")}
-          style={styles.background}
-          resizeMode="repeat"
-        >
+        <AppBackground>
           <Stack
             screenOptions={{
               animation: 'slide_from_bottom',
@@ -20,7 +17,7 @@ export default function RootLayout() {
               headerShown: false,
             }}
           />
-        </ImageBackground>
+        </AppBackground>
       </LoaderProvider>
     </GestureHandlerRootView>
   );
@@ -28,9 +25,6 @@ export default function RootLayout() {
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
-  },
-  background: {
     flex: 1,
   },
 });
