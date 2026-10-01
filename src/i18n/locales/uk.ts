@@ -5,6 +5,10 @@ export const uk: TranslationResources = {
     searchFieldPlaceholder: "Пошук міста",
     notFound: "Нічого не знайдено",
     closeSearch: "Закрити пошук",
+    deleteCityTitle: "Видалити місто",
+    deleteCityMessage: "Ви впевнені, що хочете видалити {{city}}?",
+    cancel: "Скасувати",
+    remove: "Видалити",
   },
   cityWeather: {
     loading: "Завантаження…",

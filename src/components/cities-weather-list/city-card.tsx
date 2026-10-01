@@ -71,7 +71,7 @@ export function CityCard({
             }}
             asChild
           >
-            <Pressable>
+            <Pressable onLongPress={onDelete}>
               <LinearGradient
                 colors={["#ffc285", "#f07b1f"]}
                 start={{ x: 0, y: 0 }}

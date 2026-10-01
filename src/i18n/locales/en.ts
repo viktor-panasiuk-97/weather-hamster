@@ -3,6 +3,10 @@ export const en = {
     searchFieldPlaceholder: "Search for a city",
     notFound: "Not Found",
     closeSearch: "Close search",
+    deleteCityTitle: "Remove city",
+    deleteCityMessage: "Are you sure you want to remove {{city}}?",
+    cancel: "Cancel",
+    remove: "Remove",
   },
   cityWeather: {
     loading: "Loading…",
