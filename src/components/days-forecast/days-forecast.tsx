@@ -1,5 +1,5 @@
 import { getForecastByCoordinates, type ForecastData, type ForecastItem } from "@/api/weather-api";
-import { getLocalizedWeatherDescription } from "@/utils";
+import { formatCityTime, getLocalizedWeatherDescription, toCityDate } from "@/utils";
 import type { TFunction } from "i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -13,20 +13,14 @@ type ForecastDay = {
 
 const WEEKDAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
-function formatForecastTime(unixSeconds: number, locale: string) {
-  return new Date(unixSeconds * 1000).toLocaleTimeString(locale, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 // The API returns items in chronological order, so consecutive items with the same date form a day.
-function groupByDay(list: ForecastItem[], t: TFunction): ForecastDay[] {
+// Dates are shifted to the city's timezone and read as UTC, so days split at the city's midnight.
+function groupByDay(list: ForecastItem[], tzOffsetSeconds: number, t: TFunction): ForecastDay[] {
   const days: ForecastDay[] = [];
 
   for (const item of list) {
-    const date = new Date(item.dt * 1000);
-    const key = date.toDateString();
+    const date = toCityDate(item.dt, tzOffsetSeconds);
+    const key = date.toISOString().slice(0, 10);
     const lastDay = days[days.length - 1];
 
     if (lastDay?.key === key) {
@@ -34,7 +28,7 @@ function groupByDay(list: ForecastItem[], t: TFunction): ForecastDay[] {
     } else {
       days.push({
         key,
-        label: t(`forecast.weekdays.${WEEKDAY_KEYS[date.getDay()]}`),
+        label: t(`forecast.weekdays.${WEEKDAY_KEYS[date.getUTCDay()]}`),
         items: [item],
       });
     }
@@ -86,14 +80,16 @@ export function DaysForecast({ lat, lon }: { lat: number; lon: number }) {
         </Text>
         <Text style={[styles.cell, styles.headerText]}>{t("forecast.rain")}</Text>
       </View>
-      {groupByDay(forecast.list, t).map((day) => (
+      {groupByDay(forecast.list, forecast.city.timezone, t).map((day) => (
         <View key={day.key}>
           <View style={[styles.row, styles.dayRow]}>
             <Text style={styles.dayText}>{day.label}</Text>
           </View>
           {day.items.map((item) => (
             <View key={item.dt} style={styles.row}>
-              <Text style={[styles.cell, styles.timeCell]}>{formatForecastTime(item.dt, i18n.language)}</Text>
+              <Text style={[styles.cell, styles.timeCell]}>
+                {formatCityTime(item.dt, forecast.city.timezone, i18n.language)}
+</Text>
               <Text style={styles.cell}>{Math.round(item.main.temp)}°C</Text>
               <Text style={[styles.cell, styles.weatherCell]} numberOfLines={1}>
                 {getLocalizedWeatherDescription(item.weather[0], t)}
