@@ -11,6 +11,7 @@ export const en = {
     reloadApp: "Reload App",
     retry: "Retry",
     weatherLoadError: "Couldn't load weather for some cities",
+    cityLoadError: "Couldn't load weather · Tap to retry",
   },
   cityWeather: {
     loading: "Loading…",

@@ -13,6 +13,7 @@ export const uk: TranslationResources = {
     reloadApp: "Перезавантажити",
     retry: "Повторити",
     weatherLoadError: "Не вдалося завантажити погоду для деяких міст",
+    cityLoadError: "Не вдалося завантажити погоду · Торкніться, щоб повторити",
   },
   cityWeather: {
     loading: "Завантаження…",
