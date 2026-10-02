@@ -7,6 +7,10 @@ export const en = {
     deleteCityMessage: "Are you sure you want to remove {{city}}?",
     cancel: "Cancel",
     remove: "Remove",
+    somethingWentWrong: "Oops! Something went wrong",
+    reloadApp: "Reload App",
+    retry: "Retry",
+    weatherLoadError: "Couldn't load weather for some cities",
   },
   cityWeather: {
     loading: "Loading…",

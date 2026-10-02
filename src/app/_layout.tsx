@@ -1,5 +1,6 @@
 import "@/i18n";
 import { AppBackground } from "@/components/app-background";
+import { ErrorBar } from "@/components/error-bar";
 import { LoaderProvider } from "@/context/loader";
 import { Stack } from "expo-router";
 import { StyleSheet } from "react-native";
@@ -18,6 +19,7 @@ export default function RootLayout() {
             }}
           />
         </AppBackground>
+        <ErrorBar />
       </LoaderProvider>
     </GestureHandlerRootView>
   );

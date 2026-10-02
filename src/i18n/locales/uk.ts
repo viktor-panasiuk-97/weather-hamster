@@ -9,6 +9,10 @@ export const uk: TranslationResources = {
     deleteCityMessage: "Ви впевнені, що хочете видалити {{city}}?",
     cancel: "Скасувати",
     remove: "Видалити",
+    somethingWentWrong: "Ой! Щось пішло не так",
+    reloadApp: "Перезавантажити",
+    retry: "Повторити",
+    weatherLoadError: "Не вдалося завантажити погоду для деяких міст",
   },
   cityWeather: {
     loading: "Завантаження…",
