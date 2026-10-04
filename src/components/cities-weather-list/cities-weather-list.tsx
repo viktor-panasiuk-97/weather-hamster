@@ -8,7 +8,7 @@ import { useCurrentWeatherStore } from "@/store/current-weather-in-cities";
 import { useErrorBarStore } from "@/store/error-bar";
 import { useStoresHydrated } from "@/store/use-stores-hydrated";
 import { getCityKey, getLocalizedCityName } from "@/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, StyleProp, StyleSheet, ViewStyle } from "react-native";
 
@@ -35,6 +35,18 @@ async function refreshStaleWeather(cities: GeoLocation[]): Promise<string[]> {
   return cities
     .filter((_, index) => results[index].status === "rejected")
     .map((city) => getCityKey(city));
+}
+
+// Loads one city's weather without the full-screen loader; its placeholder card shows meanwhile.
+function loadCityWeather(city: GeoLocation, setFailedKeys: Dispatch<SetStateAction<string[]>>) {
+  const key = getCityKey(city);
+  setFailedKeys((keys) => keys.filter((k) => k !== key));
+
+  refreshStaleWeather([city]).then((failed) => {
+    if (failed.length > 0) {
+      setFailedKeys((keys) => [...keys, key]);
+    }
+  });
 }
 
 type CitiesWeatherListProps = {
@@ -73,19 +85,20 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
     };
 
     refresh();
-  }, [hydrated, cities, showLoader, hideLoader, showErrorBar, i18n]);
 
-  // Retries a single city from its placeholder card, without the full-screen loader.
-  const retryCity = (city: GeoLocation) => {
-    const key = getCityKey(city);
-    setFailedKeys((keys) => keys.filter((k) => k !== key));
-
-    refreshStaleWeather([city]).then((failed) => {
-      if (failed.length > 0) {
-        setFailedKeys((keys) => [...keys, key]);
-      }
+    // After the initial refresh, only added cities need weather; removing a city fetches nothing.
+    return useCitiesStore.subscribe((state, prev) => {
+      const prevKeys = new Set(prev.cities.map(getCityKey));
+      state.cities.forEach((city) => {
+        if (!prevKeys.has(getCityKey(city))) {
+          loadCityWeather(city, setFailedKeys);
+        }
+      });
     });
-  };
+  }, [hydrated, showLoader, hideLoader, showErrorBar, i18n]);
+
+  // Retries a single city from its placeholder card.
+  const retryCity = (city: GeoLocation) => loadCityWeather(city, setFailedKeys);
 
   return (
     <>
