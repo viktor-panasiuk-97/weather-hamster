@@ -10,6 +10,7 @@ export const en = {
     somethingWentWrong: "Oops! Something went wrong",
     reloadApp: "Reload App",
     retry: "Retry",
+    dismiss: "Dismiss",
     weatherLoadError: "Couldn't load weather for some cities",
     cityLoadError: "Couldn't load weather · Tap to retry",
   },

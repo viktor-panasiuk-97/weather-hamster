@@ -39,6 +39,15 @@ export function ErrorBar() {
             {onRetry ? t("common.retry") : t("common.reloadApp")}
           </Text>
         </Pressable>
+        <Pressable
+          style={styles.closeButton}
+          onPress={hideErrorBar}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.dismiss")}
+        >
+          <Text style={styles.closeLabel}>✕</Text>
+        </Pressable>
       </View>
     </Animated.View>
   );
@@ -76,6 +85,15 @@ const styles = StyleSheet.create({
   },
   buttonLabel: {
     fontSize: 15,
+    fontWeight: "600",
+    color: "#fff",
+  },
+  closeButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  closeLabel: {
+    fontSize: 18,
     fontWeight: "600",
     color: "#fff",
   },

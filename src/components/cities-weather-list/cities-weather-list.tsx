@@ -65,6 +65,16 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
   const hydrated = useStoresHydrated();
   const { showLoader, hideLoader } = useLoader();
   const showErrorBar = useErrorBarStore((state) => state.showErrorBar);
+  const hideErrorBar = useErrorBarStore((state) => state.hideErrorBar);
+  // Keys of removed cities may linger in failedKeys, so only listed cities count.
+  const hasFailures = cities.some((city) => failedKeys.includes(getCityKey(city)));
+
+  // Hide the error bar once no listed city is failing (retried, refreshed or removed).
+  useEffect(() => {
+    if (!hasFailures) {
+      hideErrorBar();
+    }
+  }, [hasFailures, hideErrorBar]);
 
   useEffect(() => {
     if (!hydrated) {

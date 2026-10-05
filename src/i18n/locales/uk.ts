@@ -12,6 +12,7 @@ export const uk: TranslationResources = {
     somethingWentWrong: "Ой! Щось пішло не так",
     reloadApp: "Перезавантажити",
     retry: "Повторити",
+    dismiss: "Закрити",
     weatherLoadError: "Не вдалося завантажити погоду для деяких міст",
     cityLoadError: "Не вдалося завантажити погоду · Торкніться, щоб повторити",
   },
