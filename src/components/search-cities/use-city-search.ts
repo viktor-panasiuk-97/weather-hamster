@@ -1,6 +1,7 @@
 import { geoCordinatesByCityName, type GeoLocation } from "@/api/weather-api";
 import { useCitiesStore } from "@/store/cities";
 import { debounce } from "@/utils/debounce";
+import { getCityKey } from "@/utils/get-city-key";
 import { useEffect, useRef, useState } from "react";
 
 export function useCitySearch() {
@@ -14,10 +15,8 @@ export function useCitySearch() {
       geoCordinatesByCityName(searchQuery)
         .then((locations) => {
           if (latestQueryRef.current !== searchQuery) return;
-          const { cities } = useCitiesStore.getState();
-          setResults(
-            locations.filter((l) => !cities.some((c) => c.lat === l.lat && c.lon === l.lon)),
-          );
+          const savedKeys = useCitiesStore.getState().cities.map(getCityKey);
+          setResults(locations.filter((l) => !savedKeys.includes(getCityKey(l))));
         })
         .catch(() => {
           if (latestQueryRef.current !== searchQuery) return;

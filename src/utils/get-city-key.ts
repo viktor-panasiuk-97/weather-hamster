@@ -1,4 +1,4 @@
 import type { GeoLocation } from "@/api/weather-api";
 
-export const getCityKey = (city: GeoLocation): string =>
-  `${city.name}_${city.state}_${city.country}`;
+export const getCityKey = ({ lat, lon }: Pick<GeoLocation, "lat" | "lon">): string =>
+  `${lat.toFixed(4)},${lon.toFixed(4)}`;
