@@ -4,8 +4,9 @@ import { WeatherHeadline } from "@/components/weather-headline";
 import { WeatherTable } from "@/components/weather-table";
 import { useCitiesStore } from "@/store/cities";
 import { useCurrentWeatherStore } from "@/store/current-weather-in-cities";
+import { useStoresHydrated } from "@/store/use-stores-hydrated";
 import { getCityKey } from "@/utils";
-import { router, useLocalSearchParams } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text } from "react-native";
 
@@ -28,6 +29,12 @@ export default function CityForecast() {
     state.cities.find((c) => getCityKey(c) === locationKey),
   );
   const { t } = useTranslation();
+  const hydrated = useStoresHydrated();
+
+  // Persisted stores load asynchronously; before hydration every city looks missing.
+  if (hydrated && !city) {
+    return <Redirect href="/" />;
+  }
 
   return (
     <DismissibleScreen onDismiss={goHome}>
