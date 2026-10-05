@@ -3,7 +3,7 @@ import { formatCityTime, getLocalizedWeatherDescription, toCityDate } from "@/ut
 import type { TFunction } from "i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type ForecastDay = {
   key: string;
@@ -39,7 +39,9 @@ function groupByDay(list: ForecastItem[], tzOffsetSeconds: number, t: TFunction)
 
 export function DaysForecast({ lat, lon }: { lat: number; lon: number }) {
   const [forecast, setForecast] = useState<ForecastData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  // Bumped by Retry to rerun the fetch effect.
+  const [attempt, setAttempt] = useState(0);
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
@@ -52,18 +54,32 @@ export function DaysForecast({ lat, lon }: { lat: number; lon: number }) {
         }
       })
       .catch((e: unknown) => {
+        // The raw API message is for debugging only; users get the localized text.
+        console.warn("Failed to load forecast", e);
         if (!ignore) {
-          setError(e instanceof Error ? e.message : "");
+          setFailed(true);
         }
       });
 
     return () => {
       ignore = true;
     };
-  }, [lat, lon]);
+  }, [lat, lon, attempt]);
 
-  if (error !== null) {
-    return <Text style={styles.message}>{error || t("forecast.loadError")}</Text>;
+  const retry = () => {
+    setFailed(false);
+    setAttempt((n) => n + 1);
+  };
+
+  if (failed) {
+    return (
+      <View style={styles.errorBox}>
+        <Text style={styles.errorMessage}>{t("forecast.loadError")}</Text>
+        <Pressable style={styles.retryButton} onPress={retry} accessibilityRole="button">
+          <Text style={styles.retryLabel}>{t("common.retry")}</Text>
+        </Pressable>
+      </View>
+    );
   }
 
   if (!forecast) {
@@ -108,6 +124,26 @@ const styles = StyleSheet.create({
     color: "#1c1c1e",
     textAlign: "center",
     marginTop: 16,
+  },
+  errorBox: {
+    alignItems: "center",
+    gap: 12,
+    marginTop: 16,
+  },
+  errorMessage: {
+    color: "#1c1c1e",
+    textAlign: "center",
+  },
+  retryButton: {
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: "#1c1c1e",
+  },
+  retryLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#e5e5e7",
   },
   table: {
     marginTop: 16,
