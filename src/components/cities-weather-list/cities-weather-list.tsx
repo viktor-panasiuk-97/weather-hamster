@@ -57,6 +57,7 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
   const cities = useCitiesStore((state) => state.cities);
   const removeCity = useCitiesStore((state) => state.removeCity);
   const weatherByCity = useCurrentWeatherStore((state) => state.weatherByCity);
+  const removeCityWeather = useCurrentWeatherStore((state) => state.removeCityWeather);
   const [cityToDelete, setCityToDelete] = useState<GeoLocation | null>(null);
   // Not persisted: whether a city failed is decided again on every refresh.
   const [failedKeys, setFailedKeys] = useState<string[]>([]);
@@ -137,6 +138,7 @@ export function CitiesWeatherList({ style }: CitiesWeatherListProps) {
         onConfirm={() => {
           if (cityToDelete) {
             removeCity(cityToDelete);
+            removeCityWeather(getCityKey(cityToDelete));
           }
           setCityToDelete(null);
         }}

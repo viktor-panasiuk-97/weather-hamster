@@ -15,6 +15,7 @@ type CurrentWeatherState = {
     data: CurrentWeatherData,
     latestUpdateTimeStamp: number,
   ) => void;
+  removeCityWeather: (cityKey: string) => void;
 };
 
 export const useCurrentWeatherStore = create<CurrentWeatherState>()(
@@ -28,6 +29,12 @@ export const useCurrentWeatherStore = create<CurrentWeatherState>()(
             [cityKey]: { latestUpdateTimeStamp, data },
           },
         })),
+      removeCityWeather: (cityKey) =>
+        set((state) => {
+          const { [cityKey]: _removed, ...weatherByCity } = state.weatherByCity;
+
+          return { weatherByCity };
+        }),
     }),
     { name: "current-weather-in-cities", storage: zustandStorage },
   ),
